@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>TasteMap</title>
+<style>
+:root{--bg:#f2efe9;--card:#fff;--ink:#14121c;--mute:#6b6878;--line:#e2ded6;--glass:rgba(255,255,255,.72);--g:linear-gradient(120deg,#7c5cff,#ff5c8a 55%,#ffb347);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0b12;--card:#171722;--ink:#f5f3ff;--mute:#9a97ad;--line:#26263a;--glass:rgba(24,24,38,.72);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b0b12;--card:#171722;--ink:#f5f3ff;--mute:#9a97ad;--line:#26263a;--glass:rgba(24,24,38,.72);color-scheme:dark}
+*{box-sizing:border-box}html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+#app{max-width:820px;margin:0 auto;padding:14px 16px 120px}
+h1{font-size:34px;line-height:1.05;font-weight:800;letter-spacing:-1.2px;margin:6px 0 4px}
+h1 em{font-style:normal;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:20px;font-weight:800;letter-spacing:-.4px;margin:26px 0 12px}
+.sub{color:var(--mute);font-size:14px}
+input,textarea,select{width:100%;padding:14px 18px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--ink);font:inherit}
+textarea{border-radius:20px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none}
+.chip{flex:none;padding:8px 15px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;font-weight:600}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip.v.on{background:var(--g);color:#fff;border-color:transparent}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
+.car{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:none}
+.card{position:relative;aspect-ratio:4/5;border-radius:28px;overflow:hidden;color:#fff;cursor:pointer;isolation:isolate}
+.car .card{flex:none;width:74%;max-width:310px;scroll-snap-align:start;aspect-ratio:3/4}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 12%,rgba(255,255,255,.38),transparent 45%);z-index:-1}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(8,6,20,.78));z-index:-1}
+.ico{position:absolute;top:14%;left:50%;transform:translateX(-50%);font-size:64px;font-style:normal;opacity:.9;filter:drop-shadow(0 8px 14px rgba(0,0,0,.25))}
+.heart{position:absolute;top:10px;right:10px;width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;font-size:18px}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:14px}
+.cap .cat{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.cap b{display:block;font-size:17px;line-height:1.15;letter-spacing:-.3px;margin:2px 0}
+.cap small{opacity:.85;font-size:12px}
+.btn{padding:13px 20px;border-radius:99px;border:0;background:var(--g);color:#fff;font:inherit;font-weight:700}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:2px;padding:6px;border-radius:99px;background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--line);box-shadow:0 12px 30px -10px rgba(0,0,0,.4);z-index:20}
+nav button{background:none;border:0;color:var(--mute);font:inherit;font-size:11px;font-weight:600;padding:8px 12px;border-radius:99px;display:flex;flex-direction:column;align-items:center;gap:1px}
+nav button span{font-size:17px}
+nav button.on{background:var(--ink);color:var(--bg)}
+.note{border:1px dashed var(--line);border-radius:18px;padding:10px 14px;font-size:13px;color:var(--mute);margin:12px 0}
+.hero{height:340px;border-radius:0 0 36px 36px;margin:-14px -16px 0;position:relative;color:#fff;isolation:isolate;overflow:hidden}
+.hero .ico{font-size:96px;top:26%}
+.back{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:16px;border:0;border-radius:99px;padding:9px 16px;background:rgba(255,255,255,.25);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#fff;font:inherit;font-weight:700}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:4px 11px;border-radius:99px;background:var(--card);border:1px solid var(--line);margin:0 4px 4px 0}
+.rev{border-top:1px solid var(--line);padding:12px 0}
+.pv{margin-top:12px;max-width:260px}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card{animation:up .55s both;transition:transform .2s}.card:active{transform:scale(.97)}
+body::after{content:"";position:fixed;top:-130px;right:-110px;width:360px;height:360px;border-radius:50%;background:var(--g);filter:blur(90px);opacity:.32;z-index:-1;pointer-events:none}
+.sb{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;padding:8px 0;background:linear-gradient(var(--bg) 72%,transparent)}
+.sb input{box-shadow:0 10px 24px -14px rgba(0,0,0,.5)}
+@media (prefers-reduced-motion:reduce){.card{animation:none}}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:14px 0}.fact{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px 14px}.fact b{display:block;font-size:17px;letter-spacing:-.3px}.fact small{color:var(--mute);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav id="nav"></nav>
+<script>
+var RAW=[
+"Granville Island Public Market|Markets|Granville Island|2|49.2723|-123.1347|Casual,Family|Indoor market with food stalls and fresh produce.",
+"Lonsdale Quay Market|Markets|North Vancouver|2|49.3099|-123.0824|Casual,Family|Public market beside the SeaBus terminal.",
+"Vancouver Art Gallery|Attractions|Downtown|2|49.2828|-123.1207|Unique,Quiet|Art museum in the former courthouse downtown.",
+"Gastown Steam Clock|Attractions|Gastown|0|49.2845|-123.1089|Unique,Casual|Steam-powered clock on Water Street.",
+"Dr. Sun Yat-Sen Classical Chinese Garden|Attractions|Chinatown|2|49.2790|-123.1040|Quiet,Unique,Date|Classical Chinese scholar's garden.",
+"Museum of Anthropology at UBC|Attractions|Point Grey|2|49.2694|-123.2599|Unique,Quiet|Museum known for Northwest Coast Indigenous art.",
+"Science World|Attractions|False Creek|2|49.2734|-123.1038|Family|Hands-on science centre in a geodesic dome.",
+"Vancouver Aquarium|Attractions|Stanley Park|3|49.3003|-123.1308|Family|Marine life aquarium inside Stanley Park.",
+"Canada Place|Attractions|Waterfront|0|49.2888|-123.1111|Scenic,Casual|Cruise terminal with a sail-shaped roof on the harbour.",
+"Vancouver Lookout|Attractions|Downtown|2|49.2845|-123.1115|Scenic,Date|Observation deck atop Harbour Centre.",
+"Vancouver Maritime Museum|Attractions|Kitsilano|2|49.2760|-123.1470|Unique,Family|Museum of the city's seafaring history.",
+"H.R. MacMillan Space Centre|Attractions|Kitsilano|2|49.2762|-123.1450|Family,Unique|Planetarium and space science museum.",
+"Museum of Vancouver|Attractions|Kitsilano|2|49.2761|-123.1448|Unique,Quiet|Museum about the history and culture of the city.",
+"Nitobe Memorial Garden|Attractions|UBC|2|49.2669|-123.2597|Quiet,Date,Unique|Traditional Japanese garden at UBC.",
+"Bloedel Conservatory|Attractions|Little Mountain|2|49.2420|-123.1127|Quiet,Date|Domed conservatory with tropical plants and birds.",
+"Brockton Point Totem Poles|Attractions|Stanley Park|0|49.3008|-123.1186|Unique,Scenic|Collection of totem poles in Stanley Park.",
+"Lions Gate Bridge|Attractions|Stanley Park|0|49.3140|-123.1375|Scenic|Suspension bridge linking downtown to the North Shore.",
+"Chinatown Millennium Gate|Attractions|Chinatown|0|49.2800|-123.1050|Unique,Casual|Ceremonial gate marking Chinatown's entrance.",
+"Vancouver Public Library Central|Attractions|Downtown|0|49.2799|-123.1156|Quiet,Unique|Central library with a distinctive oval design.",
+"Stanley Park Seawall|Activities|Stanley Park|0|49.3017|-123.1417|Outdoor,Scenic|Waterfront path for walking and cycling.",
+"Capilano Suspension Bridge Park|Activities|North Vancouver|3|49.3429|-123.1149|Outdoor,Scenic,Family|Forest park with a suspension bridge over a canyon.",
+"Lynn Canyon Park|Activities|North Vancouver|0|49.3425|-123.0143|Outdoor,Scenic,Quiet|Canyon park with a suspension bridge and trails.",
+"Grouse Mountain|Activities|North Vancouver|3|49.3797|-123.0840|Outdoor,Scenic,Family|Mountain resort reached by the Skyride gondola.",
+"Deep Cove|Activities|North Vancouver|0|49.3295|-122.9475|Outdoor,Scenic,Friends|Village on Indian Arm known for kayaking and the Quarry Rock hike.",
+"Cypress Mountain|Activities|West Vancouver|3|49.3960|-123.2040|Outdoor,Friends|Ski and snowboard area on the North Shore.",
+"Queen Elizabeth Park|Parks|Little Mountain|0|49.2419|-123.1128|Scenic,Date|Hilltop park with gardens and city views.",
+"VanDusen Botanical Garden|Parks|Shaughnessy|2|49.2386|-123.1289|Quiet,Date|Large botanical garden with themed plantings.",
+"Pacific Spirit Regional Park|Parks|Point Grey|0|49.2530|-123.2150|Outdoor,Quiet|Forested park with a network of trails.",
+"Trout Lake (John Hendry Park)|Parks|East Vancouver|0|49.2552|-123.0645|Casual,Family|Neighbourhood park around a small lake.",
+"Lighthouse Park|Parks|West Vancouver|0|49.3297|-123.2640|Outdoor,Scenic,Quiet|Old-growth forest and a lighthouse on the coast.",
+"Whytecliff Park|Parks|West Vancouver|0|49.3710|-123.2920|Scenic,Outdoor|Rocky shoreline popular with divers and swimmers.",
+"Jericho Beach|Beaches|Point Grey|0|49.2725|-123.1943|Scenic,Quiet|Beach and park on English Bay.",
+"Kitsilano Beach|Beaches|Kitsilano|0|49.2745|-123.1548|Casual,Friends|Popular city beach with a nearby outdoor pool.",
+"Third Beach|Beaches|Stanley Park|0|49.3032|-123.1585|Scenic,Date|Stanley Park beach loved for sunsets.",
+"Second Beach|Beaches|Stanley Park|0|49.2955|-123.1520|Family,Casual|Stanley Park beach beside an outdoor pool.",
+"English Bay Beach|Beaches|West End|0|49.2865|-123.1435|Casual,Scenic|Central beach with an easy walk from downtown.",
+"Sunset Beach|Beaches|West End|0|49.2780|-123.1385|Casual,Friends|Beach along False Creek and English Bay.",
+"Spanish Banks|Beaches|Point Grey|0|49.2760|-123.2125|Scenic,Casual|Long beach with wide tidal flats and mountain views.",
+"Locarno Beach|Beaches|Point Grey|0|49.2745|-123.2090|Quiet,Casual|Quieter beach between Jericho and Spanish Banks.",
+"Wreck Beach|Beaches|UBC|0|49.2625|-123.2620|Unique,Outdoor|Secluded clothing-optional beach reached by stairs.",
+"Ambleside Beach|Beaches|West Vancouver|0|49.3255|-123.1520|Family,Scenic|Waterfront beach and park in West Vancouver.",
+"Crescent Beach|Beaches|Surrey|0|49.0485|-122.8850|Family,Casual|Seaside community beach in South Surrey.",
+"Gastown|Areas|Downtown|0|49.2837|-123.1086|Unique,Friends|Historic cobblestone district.",
+"Commercial Drive|Areas|East Vancouver|0|49.2740|-123.0700|Casual,Friends|Busy, multicultural street known for local shops.",
+"Main Street|Areas|Mount Pleasant|0|49.2640|-123.1010|Casual,Unique|Street of independent shops and neighbourhood life.",
+"Yaletown|Areas|Downtown|0|49.2745|-123.1215|Friends,Date|Converted warehouse district by False Creek.",
+"Kitsilano 4th Avenue|Areas|Kitsilano|0|49.2685|-123.1550|Casual,Friends|Shopping strip in the Kitsilano neighbourhood.",
+"Steveston Village|Areas|Richmond|0|49.1255|-123.1825|Scenic,Family|Historic fishing village on the Fraser River.",
+"Chinatown|Areas|Downtown Eastside|0|49.2795|-123.1030|Unique,Casual|One of Canada's largest historic Chinatowns.",
+"Robson Street|Areas|Downtown|0|49.2820|-123.1230|Casual,Friends|Main downtown shopping street.",
+"Davie Village|Areas|West End|0|49.2805|-123.1315|Friends,Casual|Lively LGBTQ+ neighbourhood in the West End.",
+"Vanier Park|Parks|Kitsilano|0|49.2788|-123.1450|Scenic,Casual|Waterfront park with views of downtown and the mountains.",
+"BC Place|Attractions|Downtown|0|49.2768|-123.1118|Friends|Large downtown stadium beside False Creek.",
+"Prospect Point|Attractions|Stanley Park|0|49.3155|-123.1390|Scenic|Lookout over the harbour and Lions Gate Bridge.",
+"Siwash Rock|Attractions|Stanley Park|0|49.3118|-123.1595|Scenic,Unique|Sea stack on the Stanley Park seawall.",
+"Lost Lagoon|Parks|Stanley Park|0|49.2960|-123.1385|Quiet,Scenic|Lagoon at the entrance to Stanley Park, good for an easy walk.",
+"Beaver Lake|Parks|Stanley Park|0|49.3047|-123.1363|Quiet,Outdoor|Small lake in the middle of Stanley Park.",
+"UBC Botanical Garden|Parks|UBC|2|49.2506|-123.2395|Quiet,Date|Botanical garden with forest walks and a canopy walkway.",
+"PNE Playland|Attractions|East Vancouver|2|49.2830|-123.0360|Family,Friends|Seasonal amusement park at the PNE grounds.",
+"Capilano River Hatchery|Attractions|North Vancouver|0|49.3517|-123.1118|Family,Outdoor|Salmon hatchery beside the Capilano River.",
+"Dundarave Pier|Attractions|West Vancouver|0|49.3367|-123.1745|Scenic,Quiet|Waterfront pier in West Vancouver.",
+"Horseshoe Bay|Areas|West Vancouver|0|49.3745|-123.2760|Scenic,Casual|Seaside village and ferry terminal.",
+"Golden Ears Provincial Park|Parks|Maple Ridge|1|49.3140|-122.4750|Outdoor,Scenic,Family|Large park with lakes and mountain trails.",
+"Burnaby Mountain Park|Parks|Burnaby|0|49.2790|-122.9190|Scenic,Outdoor|Hilltop park with views over Burrard Inlet.",
+"Richmond Olympic Oval|Attractions|Richmond|2|49.1739|-123.1517|Family,Friends|Sports venue from the 2010 Winter Olympics.",
+"Gulf of Georgia Cannery|Attractions|Steveston|2|49.1257|-123.1832|Unique,Family|Historic salmon cannery turned museum.",
+"Garry Point Park|Parks|Steveston|0|49.1226|-123.1970|Scenic,Casual|Waterfront park at the mouth of the Fraser River.",
+"Reifel Bird Sanctuary|Parks|Delta|2|49.0993|-123.1795|Quiet,Outdoor|Migratory bird sanctuary with walking paths.",
+"White Rock Pier|Attractions|White Rock|0|49.0220|-122.8030|Scenic,Casual|Long pier on the White Rock waterfront.",
+"White Rock Beach|Beaches|White Rock|0|49.0225|-122.8100|Family,Casual|Sandy beach with a seaside promenade."
+];
+var CC={Markets:["#ff8a3d","#ff3d6e","🥭"],Attractions:["#7c5cff","#ff5c8a","🏛️"],Activities:["#12c48b","#0a7cff","🥾"],Parks:["#7ad66b","#0aa57a","🌲"],Beaches:["#00c2ff","#5b6bff","🏖️"],Areas:["#ffb347","#ff5c8a","🏙️"]};
+var PLACES=RAW.map(function(r,i){var f=r.split("|");return {id:i+1,name:f[0],cat:f[1],hood:f[2],price:+f[3],lat:+f[4],lng:+f[5],tags:f[6].split(","),d:f[7]}});
+var CATS=["All","Markets","Attractions","Activities","Parks","Beaches","Areas"],VIBES=["Scenic","Quiet","Unique","Family","Date","Outdoor"];
+var S={tab:"explore",cat:"All",tag:"",free:false,q:"",open:null,view:"list",pv:null,saved:[],rev:{},notes:{}};
+try{var s0=localStorage.getItem("tm");if(s0){var o=JSON.parse(s0);for(var k in o)S[k]=o[k]}}catch(e){}
+function save(){try{localStorage.setItem("tm",JSON.stringify({saved:S.saved,rev:S.rev,notes:S.notes}))}catch(e){}}
+function esc(t){var d=document.createElement("div");d.textContent=t;return d.innerHTML}
+function $(x){return PLACES.filter(function(p){return p.id==x})[0]}
+function avg(id){var r=S.rev[id]||[];return r.length?r.reduce(function(a,b){return a+b.stars},0)/r.length:null}
+function money(n){return n?"$$$$".slice(0,n):"Free"}
+function bg(p){var c=CC[p.cat];return "background:linear-gradient(150deg,"+c[0]+","+c[1]+")"}
+function card(p){var a=avg(p.id),h=S.saved.indexOf(p.id)>-1;return '<div class="card" style="'+bg(p)+'" onclick="openP('+p.id+')"><i class="ico">'+CC[p.cat][2]+'</i><button class="heart" onclick="event.stopPropagation();tog('+p.id+')">'+(h?'♥':'♡')+'</button><div class="cap"><span class="cat">'+p.cat+'</span><b>'+esc(p.name)+'</b><small>'+esc(p.hood)+' · '+money(p.price)+(a?' · ★ '+a.toFixed(1):'')+'</small></div></div>'}
+function match(p){var q=S.q.toLowerCase();return (S.cat=="All"||p.cat==S.cat)&&(!S.tag||p.tags.indexOf(S.tag)>-1)&&(!S.free||!p.price)&&(!q||(p.name+p.cat+p.hood+p.tags.join(" ")+p.d).toLowerCase().indexOf(q)>-1)}
+function filters(){return '<div class="sb"><input placeholder="🔍  Where do you want to explore?" value="'+esc(S.q)+'" oninput="S.q=this.value;draw()" id="q"></div><div class="chips">'+CATS.map(function(c){return '<button class="chip'+(S.cat==c?' on':'')+'" onclick="S.cat=\''+c+'\';draw()">'+(CC[c]?CC[c][2]+' ':'')+c+'</button>'}).join("")+'</div><div class="chips" style="padding-top:0">'+VIBES.map(function(v){return '<button class="chip v'+(S.tag==v?' on':'')+'" onclick="S.tag=S.tag==\''+v+'\'?\'\':\''+v+'\';draw()">'+v+'</button>'}).join("")+'<button class="chip v'+(S.free?' on':'')+'" onclick="S.free=!S.free;draw()">Free</button></div>'}
+function explore(){
+var m=PLACES.filter(match);
+var h='<div class="sub" style="font-weight:600">📍 Vancouver, BC · '+PLACES.length+' places to discover</div><h1>Find your next <em>favourite place</em></h1><p><button class="btn" onclick="openP(PLACES[Math.floor(Math.random()*PLACES.length)].id)">✨ Surprise me</button></p>'+filters();
+if(!m.length)return h+'<p class="sub">No places match those filters.</p>';
+h+='<h2>Featured</h2><div class="car">'+m.slice(0,8).map(card).join("")+'</div>';
+h+='<h2>All places · '+m.length+'</h2><div class="grid">'+m.map(card).join("")+'</div>';
+h+='<div class="note">Real Vancouver places, listed from general knowledge, so check hours and details before you go. Photos, ratings, and restaurants, cafés and bars arrive with licensed data.</div>';
+return h}
+function mapv(){
+var m=PLACES.filter(match);
+var h='<h1>Map</h1>'+filters()+'<div class="chips"><button class="chip'+(S.view=="list"?' on':'')+'" onclick="S.view=\'list\';draw()">List</button><button class="chip'+(S.view=="map"?' on':'')+'" onclick="S.view=\'map\';draw()">Map</button></div>';
+if(S.view=="map"&&m.length){
+var la=m.map(function(p){return p.lat}),ln=m.map(function(p){return p.lng}),a=Math.min.apply(0,la),b=Math.max.apply(0,la),c=Math.min.apply(0,ln),d=Math.max.apply(0,ln),sh=Math.max(b-a,.02),sw=Math.max(d-c,.02);
+h+='<div class="note">Placeholder map: pins use real coordinates but there are no street tiles yet. The real interactive map is the next build.</div><svg viewBox="0 0 340 320" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:28px">';
+m.forEach(function(p){var x=20+(p.lng-c)/sw*300,y=20+(b-p.lat)/sh*280;h+='<g onclick="S.pv='+p.id+';draw()"><circle cx="'+x+'" cy="'+y+'" r="'+(S.pv==p.id?13:8)+'" fill="'+CC[p.cat][0]+'" stroke="#fff" stroke-width="2.5"/></g>'});
+h+='</svg>';if(S.pv&&match($(S.pv)))h+='<div class="pv">'+card($(S.pv))+'</div>'}
+else h+='<div class="grid">'+m.map(card).join("")+'</div>';
+return h}
+function saved(){var l=PLACES.filter(function(p){return S.saved.indexOf(p.id)>-1});
+var h='<h1>Saved</h1><div class="sub">Your places and notes stay on this device for now.</div>';
+if(!l.length)return h+'<p class="sub" style="margin-top:20px">Tap ♡ on any place to save it here.</p>';
+return h+'<div class="grid" style="margin-top:16px">'+l.map(card).join("")+'</div>'}
+function social(){return '<h1>Social</h1><div class="note">Following, public collections, likes and comments are Phase 2. They are not built yet, so nothing to tap here on purpose.</div>'}
+function profile(){var n=0;for(var k in S.rev)n+=S.rev[k].length;
+return '<h1>Profile</h1><div class="note">Sign-up and login need the backend (Supabase). Until then this is a local, signed-out profile.</div><p>Saved places: <b>'+S.saved.length+'</b><br>Reviews written: <b>'+n+'</b></p><h2>Appearance</h2><button class="chip" onclick="theme(\'light\')">Light</button> <button class="chip" onclick="theme(\'dark\')">Dark</button><h2>Your data</h2><button class="btn ghost" onclick="if(confirm(\'Delete all saved places, notes and reviews on this device?\')){S.saved=[];S.rev={};S.notes={};save();draw()}">Delete local data</button>'}
+function theme(t){document.documentElement.setAttribute("data-theme",t)}
+function place(){var p=$(S.open),a=avg(p.id),r=S.rev[p.id]||[],sv=S.saved.indexOf(p.id)>-1;
+var h='<div class="hero" style="'+bg(p)+'"><i class="ico">'+CC[p.cat][2]+'</i><button class="back" onclick="S.open=null;draw()">‹ Back</button></div>';
+h+='<div class="sub" style="margin-top:18px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px">'+p.cat+' · '+esc(p.hood)+' · '+money(p.price)+'</div><h1>'+esc(p.name)+'</h1><p>'+esc(p.d)+'</p><p>'+p.tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join("")+'</p>';
+var dk=Math.round(111.2*Math.sqrt(Math.pow(p.lat-49.2888,2)+Math.pow((p.lng+123.1111)*0.653,2))*10)/10;h+='<div class="facts"><div class="fact"><small>Price</small><b>'+money(p.price)+'</b></div><div class="fact"><small>Type</small><b>'+p.cat+'</b></div><div class="fact"><small>Area</small><b>'+esc(p.hood)+'</b></div><div class="fact"><small>To downtown, straight line</small><b>~'+dk+' km</b></div></div>';
+h+='<div class="note">Unverified listing: confirm hours, prices and access before visiting. Ratings from other platforms will appear here separately, labelled by source. None are connected yet.</div>';
+h+='<p><button class="btn" onclick="tog('+p.id+')">'+(sv?'Saved ✓':'Save')+'</button> <button class="btn ghost" onclick="share('+p.id+')">Share</button> <a class="btn ghost" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" href="https://maps.apple.com/?ll='+p.lat+','+p.lng+'&q='+encodeURIComponent(p.name)+'">Directions</a></p>';
+if(sv)h+='<textarea rows="2" placeholder="Private note" oninput="S.notes['+p.id+']=this.value;save()">'+esc(S.notes[p.id]||"")+'</textarea>';
+h+='<h2>More like this</h2><div class="car">'+PLACES.filter(function(x){return x.cat==p.cat&&x.id!=p.id}).slice(0,6).map(card).join("")+'</div>';h+='<h2>Community reviews</h2><div class="sub">From TasteMap users only. '+(a?'★ '+a.toFixed(1)+' from '+r.length+' review'+(r.length>1?'s':'')+(r.length<5?' (limited data)':''):'No reviews yet.')+'</div>';
+h+=r.map(function(x,i){return '<div class="rev"><b>'+'★'.repeat(x.stars)+'</b> '+esc(x.text)+' <button class="chip" style="font-size:12px;padding:4px 10px" onclick="del('+p.id+','+i+')">Delete</button></div>'}).join("");
+h+='<h2>Write a review</h2><select id="st"><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select><textarea id="tx" rows="3" placeholder="What was it like? (at least 10 characters)" style="margin-top:8px"></textarea><p><button class="btn" onclick="addRev('+p.id+')">Post review</button></p>';
+return h}
+function openP(id){S.open=id;draw();window.scrollTo(0,0)}
+function tog(id){var i=S.saved.indexOf(id);if(i>-1)S.saved.splice(i,1);else S.saved.push(id);save();draw()}
+function share(id){var p=$(id);if(navigator.share){navigator.share({title:p.name,text:p.name+" on TasteMap"}).catch(function(){})}else alert("Sharing is not available in this browser.")}
+function addRev(id){var t=document.getElementById("tx").value.trim(),s=+document.getElementById("st").value;
+if(t.length<10){alert("Please write at least 10 characters.");return}
+var r=S.rev[id]||[];if(r.length>=1){alert("One review per place. Delete yours to write a new one.");return}
+r.push({stars:s,text:t});S.rev[id]=r;save();draw()}
+function del(id,i){S.rev[id].splice(i,1);save();draw()}
+function draw(){
+var a=document.getElementById("app"),f=document.activeElement&&document.activeElement.id=="q",pos=f?document.activeElement.selectionStart:0,sy=window.scrollY;
+a.innerHTML=S.open?place():({explore:explore,map:mapv,saved:saved,social:social,profile:profile})[S.tab]();
+document.getElementById("nav").innerHTML=[["explore","✦","Explore"],["map","◎","Map"],["saved","♡","Saved"],["social","☺","Social"],["profile","●","Profile"]].map(function(t){return '<button class="'+(S.tab==t[0]&&!S.open?'on':'')+'" onclick="S.tab=\''+t[0]+'\';S.open=null;draw();window.scrollTo(0,0)"><span>'+t[1]+'</span>'+t[2]+'</button>'}).join("");
+if(f){var q=document.getElementById("q");if(q){q.focus();q.setSelectionRange(pos,pos)}}else if(!S.open)window.scrollTo(0,sy)}
+draw();
+</script>
+</body>
+</html>
